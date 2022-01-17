@@ -8,13 +8,34 @@ export default function App() {
   const [player1Ticks, setPlayer1Ticks] = useState([]);
   const [player2Ticks, setPlayer2Ticks] = useState([]);
   const [winner, setWinner] = useState('');
+  const [winnersList, setWinnersList] = useState([]);
 
+  useEffect(()=>{
+    if(winner){
+        
+        setWinnersList([...winnersList, winner]);
+        setWinner('')
+
+    }
+  }, [winner])
 
   const checkCombination = (arr) => {
     if(arr.length >= 3) {
       for(let i=0; i<resultCombinations.length; i++) {
-        if(arr.sort().toString() == resultCombinations[i].toString()){
-          setWinner(isPlayer1 ? 'Player 1' : 'Player 2');
+        let compareArr2 = [];
+        let compareArr3 = [];
+        if(arr.length > 3) {
+          let slicedArr = arr.sort().slice(1, 4)
+          compareArr2 = slicedArr.toString();
+        }
+        if(arr.length > 4) {
+          let slicedArr = arr.sort().slice(2, 5)
+          compareArr3 = slicedArr.toString();
+        }
+        let sortedArr1 = arr.sort().toString();
+        if(sortedArr1 == resultCombinations[i].toString() || compareArr2 == resultCombinations[i].toString() | compareArr3 == resultCombinations[i].toString()){
+          const winner = isPlayer1 ? 'Player 1' : 'Player 2';
+          setWinner(winner);
           break;   
         } 
       }
@@ -34,12 +55,21 @@ export default function App() {
     setIsplayer1(!isPlayer1)
   }
   
+  const onRestart = () => {
+        setPlayer1Ticks([])
+        setPlayer2Ticks([])
+        setIsplayer1(true)
+  }
+
   return (
     <View>
       <View style={styles.playerlist}>
         <Text style={[styles.activePlayer, {color: isPlayer1 ? 'green' : 'gray'}]}>Player 1</Text>
         <Text style={[styles.activePlayer, {color: isPlayer1 ? 'gray' : 'green'}]}>Player 2</Text>
       </View>
+      <TouchableHighlight onPress={() => onRestart()}>
+        <Text>RESTART</Text>
+      </TouchableHighlight>
       <View style={styles.container}>
         {boxArr.map((item, i)=>{
           let extraprops = {};
@@ -55,7 +85,9 @@ export default function App() {
         })}
       </View>
       <View>
-        <Text style={styles.winner}>{`Winner is: ${winner}`}</Text>
+        {winnersList.map((item, i)=>{
+          return <Text style={styles.winner}>{`Winner of game ${i+1} is: ${item}`}</Text>
+        })}
       </View>
     </View>
   );
@@ -66,5 +98,5 @@ const styles = StyleSheet.create({
   playerlist:{flexDirection: 'row', justifyContent: 'space-around', margin: 80},
   box: {borderWidth: 1, borderColor: 'gray', width: '26%', height: 80},
   activePlayer:{fontSize: 20, fontWeight: 'bold'},
-  winner: {fontSize: 30, fontWeight: 'bold', color: '#00ff00', textAlign: 'center', marginTop: 15}
+  winner: {fontSize: 20, fontWeight: 'bold', color: '#00ff00', textAlign: 'center', marginTop: 15}
 });
